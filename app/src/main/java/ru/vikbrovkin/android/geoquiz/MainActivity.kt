@@ -2,31 +2,29 @@ package ru.vikbrovkin.android.geoquiz
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 
 private const val TAG = "MainActivity"
+private const val KEY_INDEX = "index"
 
 class MainActivity : AppCompatActivity() {
 
+    private val quizViewModel: QuizViewModel by lazy {
+        ViewModelProviders.of(this).get(QuizViewModel::class.java)
+    }
     private lateinit var trueButton: Button
     private lateinit var falseButton: Button
     private lateinit var prevButton: Button
     private lateinit var nextButton: Button
     private lateinit var questionTextView: TextView
 
-    private val questionBank = listOf(
-            Question(R.string.question_australia, true),
-            Question(R.string.question_oceans, true),
-            Question(R.string.question_mideast, false),
-            Question(R.string.question_africa, false),
-            Question(R.string.question_americas, true),
-            Question(R.string.question_asia, true))
-
-    private var currentIndex = 0
     private var result = 0.0
     private var countDisabled = 0
 
@@ -34,6 +32,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate(Bundle?) called")
         setContentView(R.layout.activity_main)
+
+        quizViewModel.currentIndex = savedInstanceState?.getInt(KEY_INDEX, 0) ?: 0
+
+        Log.d(TAG, "Got a QuizViewModel: $quizViewModel")
 
         trueButton = findViewById(R.id.true_button)
         falseButton = findViewById(R.id.false_button)
@@ -44,29 +46,29 @@ class MainActivity : AppCompatActivity() {
         trueButton.setOnClickListener { view: View ->
             checkAnswer(true)
             buttonsEnabled(false)
-            questionBank[currentIndex].enabled = false
+            quizViewModel.questionIsEnabled(false)
             countDisabled += 1
         }
 
         falseButton.setOnClickListener { view: View ->
             checkAnswer(false)
             buttonsEnabled(false)
-            questionBank[currentIndex].enabled = false
+            quizViewModel.questionIsEnabled(false)
             countDisabled += 1
         }
 
         prevButton.setOnClickListener {
-            currentIndex = (currentIndex + questionBank.size - 1) % questionBank.size
+            quizViewModel.moveToIndexBack()
             updateQuestion()
         }
 
         nextButton.setOnClickListener {
-            currentIndex = (currentIndex + 1) % questionBank.size
+            quizViewModel.moveToIndexForward()
             updateQuestion()
         }
 
         questionTextView.setOnClickListener {
-            currentIndex = (currentIndex + 1) % questionBank.size
+            quizViewModel.moveToIndexForward()
             updateQuestion()
         }
 
@@ -74,17 +76,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateQuestion() {
-        val questionTextResId = questionBank[currentIndex].textResId
+        val questionTextResId = quizViewModel.currentQuestionText
         if (countDisabled == 6) {
             questionTextView.setText("You scored $result procent")
         } else {
             questionTextView.setText(questionTextResId)
         }
-        buttonsEnabled(questionBank[currentIndex].enabled)
+        buttonsEnabled(quizViewModel.returnIsEnabled())
     }
 
     private fun checkAnswer(userAnswer: Boolean) {
-        val correctAnswer = questionBank[currentIndex].answer
+        val correctAnswer = quizViewModel.currentQuestionAnswer
 
         val messageResId = if (userAnswer == correctAnswer) {
             R.string.correct_toast
@@ -118,6 +120,12 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         Log.d(TAG, "onPause() called")
+    }
+
+    override fun onSaveInstanceState(savedInstanceState: Bundle) {
+        super.onSaveInstanceState(savedInstanceState)
+        Log.i(TAG, "onSaveInstanceState")
+        savedInstanceState.putInt(KEY_INDEX, quizViewModel.currentIndex)
     }
 
     override fun onStop() {
