@@ -12,6 +12,8 @@ class QuizViewModel : ViewModel() {
     }
 
     var currentIndex = 0
+    var result = 0.0
+    var countDisabled = 0
 
     private val questionBank = listOf(
         Question(R.string.question_australia, true),

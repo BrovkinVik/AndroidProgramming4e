@@ -17,16 +17,13 @@ private const val KEY_INDEX = "index"
 class MainActivity : AppCompatActivity() {
 
     private val quizViewModel: QuizViewModel by lazy {
-        ViewModelProviders.of(this).get(QuizViewModel::class.java)
+        ViewModelProvider(this).get(QuizViewModel::class.java)
     }
     private lateinit var trueButton: Button
     private lateinit var falseButton: Button
     private lateinit var prevButton: Button
     private lateinit var nextButton: Button
     private lateinit var questionTextView: TextView
-
-    private var result = 0.0
-    private var countDisabled = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,14 +44,14 @@ class MainActivity : AppCompatActivity() {
             checkAnswer(true)
             buttonsEnabled(false)
             quizViewModel.questionIsEnabled(false)
-            countDisabled += 1
+            quizViewModel.countDisabled += 1
         }
 
         falseButton.setOnClickListener { view: View ->
             checkAnswer(false)
             buttonsEnabled(false)
             quizViewModel.questionIsEnabled(false)
-            countDisabled += 1
+            quizViewModel.countDisabled += 1
         }
 
         prevButton.setOnClickListener {
@@ -77,8 +74,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateQuestion() {
         val questionTextResId = quizViewModel.currentQuestionText
-        if (countDisabled == 6) {
-            questionTextView.setText("You scored $result procent")
+        if (quizViewModel.countDisabled == 6) {
+            val a = "%.2f".format(quizViewModel.result)
+            questionTextView.setText("You scored ${a} procent")
         } else {
             questionTextView.setText(questionTextResId)
         }
@@ -95,7 +93,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (messageResId == R.string.correct_toast) {
-            result += (100 / 6.0)
+            quizViewModel.result += (100 / 6.0)
         }
 
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT)
