@@ -12,6 +12,7 @@ class QuizViewModel : ViewModel() {
     }
 
     var currentIndex = 0
+    var isCheater = false
     var result = 0.0
     var countDisabled = 0
 
