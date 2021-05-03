@@ -24,7 +24,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var nextButton: Button
     private lateinit var questionTextView: TextView
 
+    // регистрация контракта
     private val cheatActivityContractRegistration = registerForActivityResult(CheatActivityContract()) { result ->
+        // получает информацию из CheatActivity, что ответ показан
         if (result != null) {
             quizViewModel.isCheater = result
         }
@@ -62,6 +64,7 @@ class MainActivity : AppCompatActivity() {
 
         cheatButton.setOnClickListener {
             val answerIsTrue = quizViewModel.currentQuestionAnswer
+            // контрактом передается правильный ответ в CheatActivity
             cheatActivityContractRegistration.launch(answerIsTrue)
         }
 
