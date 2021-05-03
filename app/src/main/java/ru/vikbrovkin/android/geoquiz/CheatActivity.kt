@@ -9,6 +9,7 @@ import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContract
+import androidx.lifecycle.ViewModelProvider
 
 const val EXTRA_ANSWER_IS_TRUE =
         "ru.vikbrovkin.android.geoquiz.answer_is_true"
@@ -23,6 +24,7 @@ class CheatActivity : AppCompatActivity() {
 
     private var answerIsTrue = false
     private var answerShown = false
+
     private lateinit var answerTextView: TextView
     private lateinit var showAnswerButton: Button
 
@@ -34,6 +36,7 @@ class CheatActivity : AppCompatActivity() {
         answerIsTrue = intent.getBooleanExtra(EXTRA_ANSWER_IS_TRUE, false)
 
         answerTextView = findViewById(R.id.answer_text_view)
+
         answerTextView.text = savedInstanceState?.getString(KEY_TEXT_VIEW, "")
         answerShown = savedInstanceState?.getBoolean(KEY_ANSWER_SHOWN, false) ?: false
 
@@ -45,7 +48,7 @@ class CheatActivity : AppCompatActivity() {
             }
             answerTextView.setText(answerText)
             answerShown = true
-
+            setAnswerShownResult(answerShown)
         }
         setAnswerShownResult(answerShown)
     }

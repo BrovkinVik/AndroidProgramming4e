@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity() {
         val questionTextResId = quizViewModel.currentQuestionText
         if (quizViewModel.countDisabled == 6) {
             val a = "%.2f".format(quizViewModel.result)
-            questionTextView.setText("You scored ${a} procent")
+            questionTextView.setText("You scored ${a} procent\nand cheated ${quizViewModel.countCheat} times")
         } else {
             questionTextView.setText(questionTextResId)
         }
@@ -99,7 +99,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun checkAnswer(userAnswer: Boolean) {
         val correctAnswer = quizViewModel.currentQuestionAnswer
-
+        if (quizViewModel.isCheater) {
+            quizViewModel.countCheat += 1
+        }
         val messageResId = when {
             quizViewModel.isCheater -> R.string.judgment_toast
             userAnswer == correctAnswer -> R.string.correct_toast
@@ -109,7 +111,7 @@ class MainActivity : AppCompatActivity() {
         if (userAnswer == correctAnswer) {
             quizViewModel.result += (100 / 6.0)
         }
-
+        quizViewModel.isCheater = false
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT)
                 .show()
     }

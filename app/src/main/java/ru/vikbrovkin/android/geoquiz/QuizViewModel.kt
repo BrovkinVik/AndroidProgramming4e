@@ -15,6 +15,7 @@ class QuizViewModel : ViewModel() {
     var isCheater = false
     var result = 0.0
     var countDisabled = 0
+    var countCheat = 0
 
     private val questionBank = listOf(
         Question(R.string.question_australia, true),
