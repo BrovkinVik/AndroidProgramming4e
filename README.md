@@ -1,2 +1,2 @@
-# AndroidProgramming4e
-Tasks from book by BigNerdRanch
+# GeoQuiz
+The first app from the book "AndroidProgramming4e"
